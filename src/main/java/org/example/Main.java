@@ -3,51 +3,49 @@ package org.example;
 import java.util.Scanner;
 
 public class Main {
-    static void main() {
+    public static void main(String[] args){
         Scanner env = new Scanner(System.in);
 
         int action;
 
+        String statusLaboratorio = Operacao.gerenciadorDeOperacao();
+
         String statusRobo = Operacao.operacaoRobo();
 
         do {
-            exibirInterface(statusRobo);
+            exibirInterface(statusLaboratorio);
             System.out.print("Ação: ");
             action = env.nextInt();
-            menu(action, env, statusRobo);
+            menu(action, env, statusLaboratorio);
         }while(action != 0);
-
     }
 
-    static void exibirInterface(String statusRobo){
+    static void exibirInterface(String statusLaboratorio){
         System.out.println("================================");
         System.out.println("MENU DE OPERAÇÃO - LABORATÓRIO");
         System.out.println("================================");
 
-        System.out.println("Status do robo: " + statusRobo + """
-                
-                1- Ações da maquina
-                
-                2 - Status do Programa
-                3 - Registro de Logs em Tempo Real
-                4 - Botão de Parada de Emergência
-                0 - Sair
-                """);
+        System.out.println("Status da maquina: " + statusLaboratorio);
+        System.out.println("\n1 - Ações da maquina");
+        System.out.println("2 - Status do Programa");
+        System.out.println("3 - Registro de Logs em Tempo Real");
+        System.out.println("4 - Botão de Parada de Emergência");
+        System.out.println("0 - Sair");
     }
 
-    static int menu(int action, Scanner env, String statusRobo){
+    static int menu(int action, Scanner env, String statusLaboratorio){
 
         switch (action){
 
-            case 1:
+            case 2:
                 System.out.println("Carregando relatório...");
-                Operacao.statusDesenvolvimento(statusRobo);
+                Operacao.statusDesenvolvimento();
               break;
 
-            case 2:
+            case 3:
                 System.out.println("Status do Programa:");
                 break;
-            case 3:
+            case 4:
                 String emergencia = emergencia(env);
                 boolean status = verificacao(emergencia, env);
                 System.out.println(status == true ? "Operação encerrada." : "Operação ainda em processo.");
