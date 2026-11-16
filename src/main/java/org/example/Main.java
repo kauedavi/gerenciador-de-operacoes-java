@@ -1,6 +1,5 @@
 package org.example;
 
-import java.io.*;
 import java.util.Scanner;
 
 public class Main {
@@ -9,35 +8,40 @@ public class Main {
 
         int action;
 
+        String statusRobo = Operacao.operacaoRobo();
+
         do {
-            exibir();
-            System.out.println("Ação:");
+            exibirInterface(statusRobo);
+            System.out.print("Ação: ");
             action = env.nextInt();
-            menu(action, env);
+            menu(action, env, statusRobo);
         }while(action != 0);
 
     }
 
-    static void exibir(){
+    static void exibirInterface(String statusRobo){
         System.out.println("================================");
-        System.out.println("MENU DE OPERAÇÃO - LABORATORIO");
+        System.out.println("MENU DE OPERAÇÃO - LABORATÓRIO");
         System.out.println("================================");
 
-        System.out.println("""
-        
-                1 - Status do Programa
-                2 - Registro de Logs em Tempo Real
-                3 - Botão de Parada de Emergência
+        System.out.println("Status do robo: " + statusRobo + """
+                
+                1- Ações da maquina
+                
+                2 - Status do Programa
+                3 - Registro de Logs em Tempo Real
+                4 - Botão de Parada de Emergência
                 0 - Sair
                 """);
     }
 
-    static int menu(int action, Scanner env){
+    static int menu(int action, Scanner env, String statusRobo){
 
         switch (action){
 
             case 1:
-
+                System.out.println("Carregando relatório...");
+                Operacao.statusDesenvolvimento(statusRobo);
               break;
 
             case 2:
