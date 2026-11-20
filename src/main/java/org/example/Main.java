@@ -3,28 +3,29 @@ package org.example;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args){
+    public static void main(String[] args) {
         Scanner env = new Scanner(System.in);
 
         int action;
-        String[] statusRobo = Operacao.atualizarRobo("Inativo", "Desabilitado", "Offline");;
+        String[] statusRobo = Operacao.atualizarRobo("Inativo", "Desabilitado", "Offline");
 
         System.out.println("Deseja iniciar maquina? S/n");
         String iniciarPrograma = env.next();
 
-        if (iniciarPrograma.equalsIgnoreCase("s")){
-            statusRobo = Operacao.atualizarRobo("Iniciando...", "Habilidado", "Online");
+        if (iniciarPrograma.equalsIgnoreCase("s")) {
+            statusRobo = Operacao.atualizarRobo("Iniciando...", "Habilitado", "Online");
         }
 
         do {
             exibirInterface(statusRobo[0]);
             System.out.print("Ação: ");
             action = env.nextInt();
+            env.nextLine(); // Evita pular o próximo nextLine
             menu(action, env, statusRobo);
-        }while(action != 0);
+        } while (action != 0);
     }
 
-    static void exibirInterface(String statusLaboratorio){
+    static void exibirInterface(String statusLaboratorio) {
         System.out.println("================================");
         System.out.println("MENU DE OPERAÇÃO - LABORATÓRIO");
         System.out.println("================================");
@@ -37,51 +38,54 @@ public class Main {
         System.out.println("0 - Sair");
     }
 
-    static int menu(int action, Scanner env, String[] statusRobo){
-
-        switch (action){
-
+    static int menu(int action, Scanner env, String[] statusRobo) {
+        switch (action) {
             case 1:
-
                 break;
 
             case 2:
                 System.out.println("Carregando relatório...");
                 Operacao.relatorioRobo(statusRobo);
-                pause();
-              break;
+                pause(env);
+                break;
 
             case 3:
                 System.out.println("Status do desenvolvimento:");
                 break;
+
             case 4:
                 String emergencia = emergencia(env);
                 boolean status = verificacao(emergencia, env);
-                System.out.println(status == true ? "Operação encerrada." : "Operação ainda em processo.");
+                env.nextLine();
+                if (status) {
+                    Operacao.aplicarStatus(statusRobo, "PARADA DE EMERGÊNCIA", "Desabilitado", "Offline");
+                    System.out.println("Operação encerrada por emergência.");
+                } else {
+                    System.out.println("Operação ainda em processo.");
+                }
+                pause(env);
                 break;
         }
         return 0;
     }
 
-    static boolean verificacao(String confirm, Scanner env){
-        if(confirm.equalsIgnoreCase("s")){
+    static boolean verificacao(String confirm, Scanner env) {
+        if (confirm.equalsIgnoreCase("s")) {
             System.out.println("Você tem certeza que deseja confirmar sua ação? s/N");
             String decision = env.next();
-
             return decision.equalsIgnoreCase("s");
         }
         return false;
     }
 
-    static String emergencia(Scanner env){
+    static String emergencia(Scanner env) {
         System.out.println("Ativar botão de emergência? s/N");
         String decision = env.next();
         return decision;
     }
 
-    static void pause() {
+    static void pause(Scanner env) {
         System.out.println("\nDeseja continuar? Pressione ENTER...");
-        new Scanner(System.in).nextLine();
+        env.nextLine();
     }
-
 }
