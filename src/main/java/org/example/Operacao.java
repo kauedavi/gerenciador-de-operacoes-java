@@ -28,7 +28,9 @@ public class Operacao {
         statusRobo[2] = comunicacao;
     }
 
-    static String[] operacaoLaboratorio(Scanner env, String[] statusRobo, int[] dadosProducao, double[] metricas) {
+    static String[] operacaoLaboratorio(Scanner env, String[] statusRobo, int[] dadosProducao,
+                                        double[] metricas, String[] logs, String[] notificacoes,
+                                        int[] contadores) {
         if (statusRobo[0].equalsIgnoreCase("Inativo") || statusRobo[0].equalsIgnoreCase("PARADA DE EMERGÊNCIA")) {
             System.out.println("\nOperação bloqueada! Status atual: " + statusRobo[0]);
             Main.pause(env);
@@ -49,14 +51,16 @@ public class Operacao {
 
             switch (opcao) {
                 case 1:
-                    avancarEtapa(statusRobo, dadosProducao, metricas);
+                    avancarEtapa(statusRobo, dadosProducao, metricas, logs, notificacoes, contadores);
                     break;
                 case 2:
                     consultarEstatisticas(dadosProducao, metricas);
+                    Main.registrarLog(logs, contadores, "Consulta de estatísticas e indicadores OEE.");
                     Main.pause(env);
                     break;
                 case 3:
                     exibirCamera(statusRobo, dadosProducao);
+                    Main.registrarLog(logs, contadores, "Visualização do feed da câmera CAM-01.");
                     Main.pause(env);
                     break;
                 case 0:
@@ -64,20 +68,24 @@ public class Operacao {
                 default:
                     System.out.println("Opção inválida.");
             }
-        } while (opcao != 0);
+        } while (opcao != 0 && !statusRobo[0].equalsIgnoreCase("PARADA DE EMERGÊNCIA"));
 
         return statusRobo;
     }
 
-    static void avancarEtapa(String[] statusRobo, int[] dadosProducao, double[] metricas) {
+    static void avancarEtapa(String[] statusRobo, int[] dadosProducao, double[] metricas,
+                             String[] logs, String[] notificacoes, int[] contadores) {
         dadosProducao[4]++;
 
         if (dadosProducao[4] == 1) {
             statusRobo[0] = "Rampa 1 - Alimentação de peça";
+            Main.registrarLog(logs, contadores, "Robô avançou para: " + statusRobo[0]);
         } else if (dadosProducao[4] == 2) {
             statusRobo[0] = "Rampa 2 - Leitura de cor (CAM-01)";
+            Main.registrarLog(logs, contadores, "Robô avançou para: " + statusRobo[0]);
         } else if (dadosProducao[4] == 3) {
             statusRobo[0] = "Rampa 3 em execução";
+            Main.registrarLog(logs, contadores, "Robô avançou para: " + statusRobo[0]);
         } else {
             dadosProducao[4] = 0;
             dadosProducao[0]++;
@@ -96,6 +104,11 @@ public class Operacao {
 
             metricas[2] = Math.min(99.0, metricas[2] + 0.5);
             statusRobo[0] = "Ciclo concluído - Peça " + corDetectada + " separada";
+            Main.registrarLog(logs, contadores, "Peça #" + dadosProducao[0] + " (" + corDetectada + ") processada com sucesso.");
+
+            if (dadosProducao[0] % 5 == 0) {
+                Main.registrarNotificacao(notificacoes, contadores, "Marco atingido: " + dadosProducao[0] + " peças processadas.");
+            }
         }
 
         System.out.println(">> Etapa atualizada: " + statusRobo[0]);

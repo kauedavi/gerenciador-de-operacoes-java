@@ -1,5 +1,7 @@
 package org.example;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 public class Main {
@@ -8,28 +10,38 @@ public class Main {
 
         int action;
         String[] statusRobo = Operacao.atualizarRobo("Inativo", "Desabilitado", "Offline");
-        int[] dadosProducao = { 0, 0, 0, 0, 0 }; // [0]Total, [1]Azul, [2]Verde, [3]Vermelho, [4]Etapa
-        double[] metricas = { 4.2, 98.5, 85.0, 96.0 }; // [0]Ciclo, [1]Acerto, [2]OEE, [3]Disponibilidade
+        int[] dadosProducao = { 0, 0, 0, 0, 0 };
+        double[] metricas = { 4.2, 98.5, 85.0, 96.0 };
+
+
+        String[] logs = new String[100];
+        String[] notificacoes = new String[50];
+        int[] contadores = { 0, 0 };
 
         System.out.println("Deseja iniciar maquina? S/n");
         String iniciarPrograma = env.next();
 
         if (iniciarPrograma.equalsIgnoreCase("s")) {
-            statusRobo = Operacao.atualizarRobo("Iniciando...", "Habilitado", "Online");
+            Operacao.aplicarStatus(statusRobo, "Iniciando...", "Habilitado", "Online");
+            registrarLog(logs, contadores, "Máquina iniciada. Programa Habilitado e comunicação Online.");
+            registrarNotificacao(notificacoes, contadores, "Célula robótica inicializada com sucesso.");
+        } else {
+            registrarLog(logs, contadores, "Sistema aberto com a máquina em modo Inativo.");
         }
 
         do {
-            exibirInterface(statusRobo[0]);
+            exibirInterface(statusRobo[0], contadores[1]);
             System.out.print("Ação: ");
             action = env.nextInt();
             env.nextLine();
-            menu(action, env, statusRobo, dadosProducao, metricas);
+            menu(action, env, statusRobo, dadosProducao, metricas, logs, notificacoes, contadores);
         } while (action != 0);
     }
 
-    static void exibirInterface(String statusLaboratorio) {
-        System.out.println("================================");
+    static void exibirInterface(String statusLaboratorio, int totalNotificacoes) {
+        System.out.println("\n================================");
         System.out.println("MENU DE OPERAÇÃO - LABORATÓRIO");
+        System.out.println("Notificações pendentes: [" + totalNotificacoes + "]");
         System.out.println("================================");
 
         System.out.println("Status da maquina: " + statusLaboratorio);
@@ -37,23 +49,27 @@ public class Main {
         System.out.println("2 - Status do Programa");
         System.out.println("3 - Registro de Logs em Tempo Real");
         System.out.println("4 - Botão de Parada de Emergência");
+        System.out.println("5 - Central de Notificações");
         System.out.println("0 - Sair");
     }
 
-    static int menu(int action, Scanner env, String[] statusRobo, int[] dadosProducao, double[] metricas) {
+    static int menu(int action, Scanner env, String[] statusRobo, int[] dadosProducao,
+                    double[] metricas, String[] logs, String[] notificacoes, int[] contadores) {
         switch (action) {
             case 1:
-                Operacao.operacaoLaboratorio(env, statusRobo, dadosProducao, metricas);
+                Operacao.operacaoLaboratorio(env, statusRobo, dadosProducao, metricas, logs, notificacoes, contadores);
                 break;
 
             case 2:
-                System.out.println("Carregando relatório...");
+                System.out.println("\nCarregando relatório...");
                 Operacao.relatorioRobo(statusRobo);
+                registrarLog(logs, contadores, "Consulta ao status do programa e comunicação.");
                 pause(env);
                 break;
 
             case 3:
-                System.out.println("Status do desenvolvimento:");
+                exibirLogs(logs, contadores[0]);
+                pause(env);
                 break;
 
             case 4:
@@ -62,14 +78,70 @@ public class Main {
                 env.nextLine();
                 if (status) {
                     Operacao.aplicarStatus(statusRobo, "PARADA DE EMERGÊNCIA", "Desabilitado", "Offline");
+                    registrarLog(logs, contadores, "ALERTA CRÍTICO: Botão de Parada de Emergência acionado!");
+                    registrarNotificacao(notificacoes, contadores, "EMERGÊNCIA ACIONADA! Célula interrompida.");
                     System.out.println("Operação encerrada por emergência.");
                 } else {
                     System.out.println("Operação ainda em processo.");
                 }
                 pause(env);
                 break;
+
+            case 5:
+                exibirNotificacoes(notificacoes, contadores);
+                pause(env);
+                break;
+
+            case 0:
+                break;
+
+            default:
+                System.out.println("Opção inválida.");
+                break;
         }
         return 0;
+    }
+
+    static void registrarLog(String[] logs, int[] contadores, String mensagem) {
+        if (contadores[0] < logs.length) {
+            String hora = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+            logs[contadores[0]] = "[" + hora + "] " + mensagem;
+            contadores[0]++;
+        }
+    }
+
+    static void exibirLogs(String[] logs, int totalLogs) {
+        System.out.println("\n================================================");
+        System.out.println("LOGS DO ROBÔ EM TEMPO REAL");
+        System.out.println("================================================");
+        if (totalLogs == 0) {
+            System.out.println("Nenhum evento registrado até o momento.");
+        } else {
+            for (int i = 0; i < totalLogs; i++) {
+                System.out.println(logs[i]);
+            }
+        }
+    }
+
+    static void registrarNotificacao(String[] notificacoes, int[] contadores, String alerta) {
+        if (contadores[1] < notificacoes.length) {
+            String hora = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+            notificacoes[contadores[1]] = "[" + hora + "] " + alerta;
+            contadores[1]++;
+        }
+    }
+
+    static void exibirNotificacoes(String[] notificacoes, int[] contadores) {
+        System.out.println("\n============================");
+        System.out.println("CENTRAL DE NOTIFICAÇÕES");
+        System.out.println("============================");
+        if (contadores[1] == 0) {
+            System.out.println("Nenhuma notificação no momento.");
+        } else {
+            for (int i = 0; i < contadores[1]; i++) {
+                System.out.println((i + 1) + ". " + notificacoes[i]);
+            }
+        }
     }
 
     static boolean verificacao(String confirm, Scanner env) {
