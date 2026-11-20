@@ -33,6 +33,7 @@ public class Operacao {
                                         int[] contadores) {
         if (statusRobo[0].equalsIgnoreCase("Inativo") || statusRobo[0].equalsIgnoreCase("PARADA DE EMERGÊNCIA")) {
             System.out.println("\nOperação bloqueada! Status atual: " + statusRobo[0]);
+            System.out.println("Solicite ao Administrador o rearme da máquina nas Configurações.");
             Main.pause(env);
             return statusRobo;
         }
