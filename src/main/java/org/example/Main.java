@@ -5,6 +5,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 public class Main {
+
+    // Códigos de cores ANSI para o terminal (RNF-08 e RNF-04)
+    static final String RESET = "\u001B[0m";
+    static final String VERMELHO = "\u001B[31m";
+    static final String VERDE = "\u001B[32m";
+    static final String AMARELO = "\u001B[33m";
+    static final String AZUL = "\u001B[34m";
+
     public static void main(String[] args) {
         Scanner env = new Scanner(System.in);
 
@@ -16,7 +24,7 @@ public class Main {
         String[] logs = new String[100];
         String[] notificacoes = new String[50];
         int[] contadores = { 0, 0 };
-        
+
         String[] usuario = realizarLogin(env);
         registrarLog(logs, contadores, "Usuário '" + usuario[0] + "' (" + usuario[1] + ") iniciou sessão.");
 
@@ -32,7 +40,7 @@ public class Main {
         }
 
         do {
-            exibirInterface(statusRobo[0], usuario, contadores[1]);
+            exibirInterface(statusRobo, usuario, contadores[1]);
             System.out.print("Ação: ");
             action = env.nextInt();
             env.nextLine();
@@ -62,20 +70,21 @@ public class Main {
         return usuario;
     }
 
-    static void exibirInterface(String statusLaboratorio, String[] usuario, int totalNotificacoes) {
+    static void exibirInterface(String[] statusRobo, String[] usuario, int totalNotificacoes) {
         String horaAtual = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        String corStatus = obterCorStatus(statusRobo[0]);
 
         System.out.println("\n================================================");
-        System.out.println("SENAI | SISTEMA DE MONITORAMENTO INTEGRADO"); // RF-16
-        System.out.println("Hora: " + horaAtual + " | Usuário: " + usuario[0] + " (" + usuario[1] + ")"); // RF-17, RF-19
-        System.out.println("Notificações pendentes: [" + totalNotificacoes + "]"); // RF-18
+        System.out.println("SENAI | SISTEMA DE MONITORAMENTO INTEGRADO");
+        System.out.println("Hora: " + horaAtual + " | Usuário: " + usuario[0] + " (" + usuario[1] + ")");
+        System.out.println("Notificações pendentes: [" + totalNotificacoes + "]");
         System.out.println("================================================");
 
-        System.out.println("Status da maquina: " + statusLaboratorio);
+        System.out.println("Status da maquina: " + corStatus + statusRobo[0] + RESET);
         System.out.println("\n1 - Ações da maquina (Painel Operacional)");
         System.out.println("2 - Status do Programa e Comunicação");
         System.out.println("3 - Registro de Logs em Tempo Real");
-        System.out.println("4 - [!] BOTÃO DE PARADA DE EMERGÊNCIA");
+        System.out.println(VERMELHO + "4 - [!] BOTÃO DE PARADA DE EMERGÊNCIA" + RESET);
         System.out.println("5 - Central de Notificações");
         System.out.println("6 - Configurações e Rearme (Restrito Admin)");
         System.out.println("0 - Sair (Logout)");
@@ -109,7 +118,7 @@ public class Main {
                     Operacao.aplicarStatus(statusRobo, "PARADA DE EMERGÊNCIA", "Desabilitado", "Offline");
                     registrarLog(logs, contadores, "ALERTA CRÍTICO: Botão de Parada de Emergência acionado!");
                     registrarNotificacao(notificacoes, contadores, "EMERGÊNCIA ACIONADA! Célula interrompida.");
-                    System.out.println("PARADA DE EMERGÊNCIA ATIVADA! Operação interrompida.");
+                    System.out.println(VERMELHO + "PARADA DE EMERGÊNCIA ATIVADA! Operação interrompida." + RESET);
                 } else {
                     System.out.println("Operação ainda em processo.");
                 }
@@ -138,7 +147,7 @@ public class Main {
     static void menuConfiguracoes(Scanner env, String[] statusRobo, String[] logs,
                                   String[] notificacoes, int[] contadores, String[] usuario) {
         if (!usuario[1].equalsIgnoreCase("Administrador")) {
-            System.out.println("\nAcesso negado! Apenas perfil Administrador pode acessar Configurações.");
+            System.out.println(VERMELHO + "\nAcesso negado! Apenas perfil Administrador pode acessar Configurações." + RESET);
             registrarLog(logs, contadores, "Tentativa de acesso não autorizado às Configurações por " + usuario[0] + ".");
             pause(env);
             return;
@@ -158,7 +167,7 @@ public class Main {
             Operacao.aplicarStatus(statusRobo, "Iniciando...", "Habilitado", "Online");
             registrarLog(logs, contadores, "Máquina rearmada pelo Administrador " + usuario[0] + ".");
             registrarNotificacao(notificacoes, contadores, "Sistema rearmado e pronto para operar.");
-            System.out.println("Máquina rearmada e Online!");
+            System.out.println(VERDE + "Máquina rearmada e Online!" + RESET);
         } else if (opc == 2) {
             Operacao.aplicarStatus(statusRobo, "Inativo", "Desabilitado", "Offline");
             registrarLog(logs, contadores, "Máquina colocada em modo Inativo pelo Administrador.");
@@ -209,6 +218,15 @@ public class Main {
         }
     }
 
+    static String obterCorStatus(String status) {
+        if (status.equalsIgnoreCase("PARADA DE EMERGÊNCIA") || status.equalsIgnoreCase("Inativo")) {
+            return VERMELHO;
+        } else if (status.contains("Rampa") || status.equalsIgnoreCase("Iniciando...")) {
+            return AZUL;
+        }
+        return VERDE;
+    }
+
     static boolean verificacao(String confirm, Scanner env) {
         if (confirm.equalsIgnoreCase("s")) {
             System.out.println("Você tem certeza que deseja confirmar sua ação? s/N");
@@ -219,7 +237,7 @@ public class Main {
     }
 
     static String emergencia(Scanner env) {
-        System.out.println("Ativar botão de emergência? s/N");
+        System.out.println(VERMELHO + "Ativar botão de emergência? s/N" + RESET);
         String decision = env.next();
         return decision;
     }

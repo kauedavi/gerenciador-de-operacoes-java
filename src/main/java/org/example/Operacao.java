@@ -6,12 +6,19 @@ public class Operacao {
 
     static void relatorioRobo(String[] statusRobo) {
         if (!statusRobo[0].equalsIgnoreCase("inativo")) {
+            String corStatus = statusRobo[0].equalsIgnoreCase("PARADA DE EMERGÊNCIA")
+                    ? Main.VERMELHO : Main.AZUL;
+            String corPrograma = statusRobo[1].equalsIgnoreCase("Habilitado")
+                    ? Main.VERDE : Main.VERMELHO;
+            String corComunicacao = statusRobo[2].equalsIgnoreCase("Online")
+                    ? Main.VERDE : Main.VERMELHO;
+
             System.out.println("============================");
             System.out.println("RELATÓRIO DE OPERAÇÃO DO ROBO:");
             System.out.println("============================");
-            System.out.println("Status do Robô: " + statusRobo[0]);
-            System.out.println("Programa de controle do robô: " + statusRobo[1]);
-            System.out.println("Status de comunicação: " + statusRobo[2]);
+            System.out.println("Status do Robô: " + corStatus + statusRobo[0] + Main.RESET);
+            System.out.println("Programa de controle do robô: " + corPrograma + statusRobo[1] + Main.RESET);
+            System.out.println("Status de comunicação: " + corComunicacao + statusRobo[2] + Main.RESET);
         } else {
             System.out.println("Esse robô está fora de operação.");
         }
@@ -32,7 +39,7 @@ public class Operacao {
                                         double[] metricas, String[] logs, String[] notificacoes,
                                         int[] contadores) {
         if (statusRobo[0].equalsIgnoreCase("Inativo") || statusRobo[0].equalsIgnoreCase("PARADA DE EMERGÊNCIA")) {
-            System.out.println("\nOperação bloqueada! Status atual: " + statusRobo[0]);
+            System.out.println(Main.VERMELHO + "\nOperação bloqueada! Status atual: " + statusRobo[0] + Main.RESET);
             System.out.println("Solicite ao Administrador o rearme da máquina nas Configurações.");
             Main.pause(env);
             return statusRobo;
@@ -42,7 +49,7 @@ public class Operacao {
         do {
             System.out.println("\n============================");
             System.out.println("PAINEL DA CÉLULA ROBÓTICA");
-            System.out.println("Status atual: " + statusRobo[0]);
+            System.out.println("Status atual: " + Main.AZUL + statusRobo[0] + Main.RESET);
             System.out.println("============================");
             exibirMenuOperacao();
             System.out.println("0 - Voltar ao menu principal");
@@ -103,7 +110,9 @@ public class Operacao {
                 corDetectada = "Vermelho";
             }
 
+            metricas[0] = 4.2;
             metricas[2] = Math.min(99.0, metricas[2] + 0.5);
+
             statusRobo[0] = "Ciclo concluído - Peça " + corDetectada + " separada";
             Main.registrarLog(logs, contadores, "Peça #" + dadosProducao[0] + " (" + corDetectada + ") processada com sucesso.");
 
@@ -112,7 +121,7 @@ public class Operacao {
             }
         }
 
-        System.out.println(">> Etapa atualizada: " + statusRobo[0]);
+        System.out.println(Main.AZUL + ">> Etapa atualizada: " + statusRobo[0] + Main.RESET);
     }
 
     static void consultarEstatisticas(int[] dadosProducao, double[] metricas) {
@@ -137,7 +146,7 @@ public class Operacao {
 
         System.out.println("\n================================================");
         System.out.println("ESQUEMÁTICO DA CÉLULA - CÂMERA [CAM-01]");
-        System.out.println("[● REC] | Visão Computacional: " + statusVisao);
+        System.out.println(Main.VERMELHO + "[● REC]" + Main.RESET + " | Visão Computacional: " + Main.VERDE + statusVisao + Main.RESET);
         System.out.println("================================================");
         System.out.println("  +------------------------------------------+");
         System.out.println("  |  [CAM-01] --->  ( Sensor Óptico )        |");
@@ -148,8 +157,8 @@ public class Operacao {
     }
 
     static void exibirMenuOperacao() {
-        System.out.println("1 - ir para proxima etapa");
-        System.out.println("2 - consultar estatisticas");
+        System.out.println("1 - Ir para proxima etapa");
+        System.out.println("2 - Consultar estatisticas");
         System.out.println("3 - Exibir imagens da camera");
     }
 }
