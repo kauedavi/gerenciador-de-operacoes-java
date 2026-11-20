@@ -8,6 +8,8 @@ public class Main {
 
         int action;
         String[] statusRobo = Operacao.atualizarRobo("Inativo", "Desabilitado", "Offline");
+        int[] dadosProducao = { 0, 0, 0, 0, 0 }; // [0]Total, [1]Azul, [2]Verde, [3]Vermelho, [4]Etapa
+        double[] metricas = { 4.2, 98.5, 85.0, 96.0 }; // [0]Ciclo, [1]Acerto, [2]OEE, [3]Disponibilidade
 
         System.out.println("Deseja iniciar maquina? S/n");
         String iniciarPrograma = env.next();
@@ -20,8 +22,8 @@ public class Main {
             exibirInterface(statusRobo[0]);
             System.out.print("Ação: ");
             action = env.nextInt();
-            env.nextLine(); // Evita pular o próximo nextLine
-            menu(action, env, statusRobo);
+            env.nextLine();
+            menu(action, env, statusRobo, dadosProducao, metricas);
         } while (action != 0);
     }
 
@@ -38,9 +40,10 @@ public class Main {
         System.out.println("0 - Sair");
     }
 
-    static int menu(int action, Scanner env, String[] statusRobo) {
+    static int menu(int action, Scanner env, String[] statusRobo, int[] dadosProducao, double[] metricas) {
         switch (action) {
             case 1:
+                Operacao.operacaoLaboratorio(env, statusRobo, dadosProducao, metricas);
                 break;
 
             case 2:
