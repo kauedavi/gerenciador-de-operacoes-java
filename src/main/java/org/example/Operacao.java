@@ -5,24 +5,28 @@ import java.util.Scanner;
 public class Operacao {
 
 
-    public static String gerenciadorDeOperacao(){
-        Scanner env = new Scanner(System.in);
-        System.out.println("Deseja iniciar algum projeto? S/n");
-        String declaracao = env.next();
 
-        if (declaracao.equalsIgnoreCase("s")) {
-
+    static void relatorioRobo(String[] statusRobo){
+        if(!statusRobo[0].equalsIgnoreCase("inativo")){
+            System.out.println("============================");
+            System.out.println("RELATÓRIO DE OPERAÇÃO DO ROBO:");
+            System.out.println("============================");
+            System.out.println("Status do Robô: " + statusRobo[0]);
+            System.out.println("Programa de controle do robô: " + statusRobo[1]);
+            System.out.println("Status de comunicação: " + statusRobo[2]);
+        }else{
+            System.out.println("Esse robô está fora de operação.");
         }
-
-        return "inativo";
     }
 
-    static String operacaoRobo(){
-        return "";
+    static String[] atualizarRobo(String statusRobo, String controleRobo, String comunicacaoRobo){
+        String[] robo = { statusRobo, controleRobo, comunicacaoRobo };
+        return robo;
     }
 
-    static String statusDesenvolvimento(){
-
-        return "";
+    static void exibirMenuOperacao(){
+        System.out.println("");
+        System.out.println("");
+        System.out.println("");
     }
 }

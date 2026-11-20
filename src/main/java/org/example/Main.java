@@ -7,16 +7,20 @@ public class Main {
         Scanner env = new Scanner(System.in);
 
         int action;
+        String[] statusRobo = Operacao.atualizarRobo("Inativo", "Desabilitado", "Offline");;
 
-        String statusLaboratorio = Operacao.gerenciadorDeOperacao();
+        System.out.println("Deseja iniciar maquina? S/n");
+        String iniciarPrograma = env.next();
 
-        String statusRobo = Operacao.operacaoRobo();
+        if (iniciarPrograma.equalsIgnoreCase("s")){
+            statusRobo = Operacao.atualizarRobo("Iniciando...", "Habilidado", "Online");
+        }
 
         do {
-            exibirInterface(statusLaboratorio);
+            exibirInterface(statusRobo[0]);
             System.out.print("Ação: ");
             action = env.nextInt();
-            menu(action, env, statusLaboratorio);
+            menu(action, env, statusRobo);
         }while(action != 0);
     }
 
@@ -33,17 +37,22 @@ public class Main {
         System.out.println("0 - Sair");
     }
 
-    static int menu(int action, Scanner env, String statusLaboratorio){
+    static int menu(int action, Scanner env, String[] statusRobo){
 
         switch (action){
 
+            case 1:
+
+                break;
+
             case 2:
                 System.out.println("Carregando relatório...");
-                Operacao.statusDesenvolvimento();
+                Operacao.relatorioRobo(statusRobo);
+                pause();
               break;
 
             case 3:
-                System.out.println("Status do Programa:");
+                System.out.println("Status do desenvolvimento:");
                 break;
             case 4:
                 String emergencia = emergencia(env);
@@ -69,4 +78,10 @@ public class Main {
         String decision = env.next();
         return decision;
     }
+
+    static void pause() {
+        System.out.println("\nDeseja continuar? Pressione ENTER...");
+        new Scanner(System.in).nextLine();
+    }
+
 }
